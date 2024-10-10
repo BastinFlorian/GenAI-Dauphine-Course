@@ -1,0 +1,3832 @@
+Generative AI with LLM
+Florian Bastin
+👨🏼‍🎓 Master MASH - Université PSL
+👨🏼‍💻 LLM Engineer @OctoTechnology
+Le Monde, Casino, Channel, Club Med, Pernod Ricard, Suez
+1
+
+2
+Module Overview:
+
+Building Large Language Models
+Transformers
+Retrieval Augmented Generation
+Tools and Agents
+Fine tuning and optimization techniques
+Generative AI in vision
+
+
+
+
+3
+Transformers
+A. Before Transformers 
+N grams
+Embeddings
+RNN 
+LSTM
+
+B. Transformers 
+Self Attention / Cross Attention
+Multi-Head Attention
+Residual connection & Layer normalization
+Feed forward layer
+Softmax Layer
+Positional Embeddings
+Retrieval Augmented Generation
+Fine tuning and optimization techniques
+Generative AI in vision
+Brief history on attention 
+Self Attention / Cross Attention
+Multi-Head Attention
+Residual connection & Layer normalization
+Feed forward layer
+Softmax Layer
+Positional Embeddings
+
+
+
+
+Building Large Language Models
+Pretraining a Large Language Model
+Introduction
+Cross entropy loss
+Tokenization
+Evaluation
+Data preprocessing
+Scaling laws
+Training process
+Cost and optimization
+Fine tuning a Large Language Model
+Supervised Fine Tuning
+RLHF
+Reward model
+PPO & DPO
+Evaluation & Challenges
+
+II. 	Transformers
+Before Transformers 
+N grams
+Embeddings
+RNN 
+LSTM
+ B. 	Transformers 
+Self Attention / Cross Attention
+Multi-Head Attention
+Residual connection & Layer normalization
+Feed forward layer
+Softmax Layer
+Positional Embeddings
+
+	
+
+
+
+4
+Building Large Language Models
+Pre training phase
+
+Post training phase
+
+A. Pretraining a Large Language Model
+Introduction
+Cross entropy loss
+Tokenization
+Evaluation
+Data preprocessing
+Scaling laws
+Training process
+Cost and optimization
+
+B. Fine tuning a Large Language Model
+Supervised Fine Tuning
+RLHF
+Reward model
+PPO & DPO
+Evaluation & Challenges
+
+5
+I.A Pretraining Large Language Model
+Pre training phase
+
+A. Pretraining a Large Language Model
+Introduction
+Cross entropy loss
+Tokenization
+Evaluation
+Data preprocessing
+Scaling laws
+Training process
+Cost and optimization
+
+Autoregressive language models:
+
+The chain rule of probability:  p(x1, x,2, …, xn) = p(x1) p(x2| x1) p(x3| x2,x1) …
+Language modelling
+6
+I.A.1 Introduction
+Language Models: probability distribution over a sequence of words p(x1, … xn)
+			
+P(Transformers, are, encoder, decoder, models) = 0.01
+
+P(Transformers, are, are, encoder, decoder, models) = 0.0001  	Syntactic knowledge
+
+P(Transformers, are, decoder, models) = 0.001 	Semantic knowledge
+
+
+
+
+
+
+
+
+P(Transformers, are, encoder, decoder, models) = P(Transformers)
+     . P(Transformers are | Transformers)
+     … 
+     . P(models | Transformers, are, encoder, decoder)
+
+P(Transformers, are, encoder, decoder, models) = 0.1 -> Probabilité d’être trouvé en ligne ou dite par un humain 
+P(Transformers, is, encoder, decoder, models) = 0.001 -> Le modèle doit savoir qu’il y a une erreur syntactic 
+P(Transformers, are, decoder, models) = 0.001 -> Le modèle doit savoir qu’il y a une erreur de sens 
+
+
+Generative models, Langage Model are generative models, à partir d’une distribution de ces mots, à partir de chaque suite de mot, on peut prédire le prochain 
+On utilise les modèles autoregressifs. 
+Il fonctionnent comme ca, prédire le prochain mot à partir des mots précédents. Un peu plus long car on fait une approche séq
+
+
+
+
+
+Language modelling
+7
+I.A.1 Introduction
+Model
+The goal is to generate token by token 
+
+The steps for generation:
+
+Tokenize 
+Feed the model with the token 
+Predict the probability of each possible token 
+Sample from the likelihood			
+Detokenize	
+Transformers are encoder 
+9140           388     527    24592
+
+8832
+Decoding
+Polo Club, Transformer Explainer [Blog]
+PLusieurs étapes, chaque mot est tokenizé dans un registre de 50k mots
+
+
+Quel est le problème avec un nouveau mot du dictionnaire ? 
+
+
+How the model works ? 
+8
+I.A.1 Introduction
+The general model pipeline is as follows:
+
+Feed word embedding for previous (context) 
+words into a network
+Get vector representation of context from 
+the network
+From this vector representation, predict a
+ probability distribution for the next token.
+
+Lena Voita, Language Modeling [Blog] 
+Les mots sont transformés en token puis embeddings (représentation vectoriel), on le donne a un modèle qui est le transformer, on obtient une représentation vectoriel, on le fait passer dans une linear layer et on obtient un softamax sur chaque token 
+
+
+Cross entropy loss
+9
+I.A.2 Cross Entropy Loss
+The general model pipeline is as follows:
+
+Feed word embedding for previous (context) words into a network
+Get vector representation of context from the network
+From this vector representation, predict a probability distribution for the next token.
+
+
+
+Lena Voita, Language Modeling [Blog] 
+
+Maximizing the likelihood is equivalent to minimizing the cross entropy loss:
+Les mots sont transformés en token puis embeddings (représentation vectoriel), on le donne a un modèle qui est le transformer, on obtient une représentation vectoriel, on le fait passer dans une linear layer et on obtient un softamax sur chaque token 
+
+On optimise cross entropy car ca revient le maximum de vraissemblance qui est la P du prochain mot. Notre objtectif est d’être sur du prochain mot à utiliser
+
+
+Tokenization
+10
+I.A.3 Tokenization
+How to split ? 
+Word ? 
+Letter ?
+How to split and get token ? 
+Byte-Pair Encoding (BPE) process:
+1. Use a big corpus of text
+2. Consider first one token per character
+3. Merge commons pairs 
+4. Stop when a you cannot merge or the Vocab size is reached
+This GIF is generated from GPT o1 using the following prompt
+From the following sentence: Transformers are encoder decoder models
+Apply the following steps: 
+- Create a manim code to display this sentence where each character has a different color 
+- Iterate through the sentence merging commons pairs as done n the Byte Pair Encoding system 
+- Change the colors of new pair
+- Continue until all commons pair are made 
+- Update at each step the manim code 
+- Edit the previous code to not keep one color after merging on the merge pair. The selected color should be the one with the highest number of letters
+- Edit the code at the final stage to change color if two adjacent different pair have same color
+
+Comment tokenizer ? Des idées ? 
+Dans le cas d’une typo on aimerait quand même pouvoir certaines parties de l’input
+
+Très importants, permettent d’optimiser la performance du modèles, sont prédits
+Si on pense au mot, est ce qu’un séparateur espace est la bonne chose
+Alors si on pense caractère par caractère, on doit prédire chaque lettre et ca devient une sequence très longue. Plus la séquence est longue plus le processus est long 
+
+
+Tokenization
+11
+I.A.3 Tokenization
+
+Byte-Pair Encoding (BPE) was introduced in Neural Machine Translation of Rare Words with Subword Units (Sennrich et al., 2015). BPE relies on a pre-tokenizer that splits the training data into words. 
+
+Pretokenization can be as simple as space tokenization, e.g. GPT-2, RoBERTa. More advanced pre-tokenization include rule-based tokenization, e.g. XLM, FlauBERT which uses Moses for most languages, or GPT which uses spaCy and ftfy, to count the frequency of each word in the training corpus.
+
+
+Q. What is the problem with numbers as tokens ?
+Pre tokenizer consiste a splitter par espace pour ne pas faire de regroupement par espace. 
+Dans notre exemple quelle serait la potentielle prédiction de “Une phrase en 
+
+A lot of computational tricks we can do with tokenizer et il y a des axes d’améliorations
+Les nombres sont vues comme des tokens aussi. On fait des compositions de token 
+
+Le modèle perd la relation entre deux nombres, 20 n’est plus la moitié de 10
+
+GPT 4 a changé la facon de tokenizer le code, pour gérer les 4 espaces par exemple pour l’indentation
+
+
+Evaluation 
+12
+I.A.4 Evaluation
+Instead of cross-entropy, it is more common to report its transformation called perplexity:
+A better model has higher log-likelihood and lower perplexity.
+Perplexity = 10 ≃ The model hesitates between 10 tokens
+To better understand which values we can expect, let's evaluate the best and the worst possible perplexities.
+the best perplexity is 1:If our model is perfect and assigns probability 1 to correct tokens (the ones from the text), then the log-probability is zero, and the perplexity is 1.
+the worst perplexity is |V|:In the worst case, LM knows absolutely nothing about the data: it thinks that all tokens have the same probability 1/|V|
+
+
+
+Q. Prove that the worst perplexity is |V|
+Lena Voita, Language Modeling [Blog] 
+On utilise la perplexity, quelque chose d’un peu plus compréhensible que la validation loss
+2 logs depend on the base
+
+La perpleixté  été divisé par 10 entre 2017 et 2023
+
+
+Evaluation
+13
+I.A.4 Evaluation
+Perplexity depends on vocabulary size, ie tokenization method: not used anymore
+We now use evaluation Datasets
+IFEval
+BBH
+MMLU-Pro
+Math
+…
+Different fields (medical, math, physics, …)
+covered in the Dataset to provide diversity
+Hugging Face, Open LLM Leaderboard 
+Evaluation Datasets
+Hugging Face LLM Leaderboard
+Basé sur le vocab size donc varie selon les tokenizers, nouvelles méthodes avec les dataset d’évaluation grâce à Hugging Face
+
+Evaluation
+14
+I.A.4 Evaluation
+
+Evaluation process: 
+Get the likelihood of each answer
+Ask the model to answer A) B) C) D)
+
+BIG-Bench Hard [Github]
+Q. If the model is trained of the whole internet, how could it be contaminated? 
+Lena Voita, Language Modeling [Blog] 
+On utilise la perplexity, quelque chose d’un peu plus compréhensible que la validation loss
+2 logs depend on the base
+
+Fun fact: différent manière d’évaluer les LLMs et certains sont bon sur certains dataset et mauvais sur d’autres
+Des modèles ont été entrainé sur des dataset d’évaluation. Ils peuvent donc bien performé. 
+
+Un trick pour le savoir est de vérifier si les dataset ont plus de chance d’etre généré dans l’ordre de leur écriture dans le test set sachant qu’ils ne sont pas randomisé normalement. Si c’est le cas, ca veut dire que les LLMs on été entrainé sur la donnée d’internet y compris les dataset en questions
+
+Preprocessing the Data
+15
+I.A.5 Data Preprocessing
+• Idea: use all of the clean internet
+• Note: internet is dirty & not representative of what we want. 
+
+Practice:
+
+1. Download all of internet. Common crawl: 250 billion pages, > 1PB (>1e6 GB)
+2. Text extraction from HTML (challenges: math, boilerplate)
+3. Filter undesirable content (e.g. NSFW, harmful content, PII)
+4. Deduplicates (url/document/line). E.g. all the headers/footers/menu in forums are always same
+5. Heuristic filtering. Remove low quality documents (e.g. # words, word length, outlier tokens, dirty tokens)
+6. Model based filtering. Predict if page could be references by Wikipedia.
+7. Data mix. Classify data categories (code/books/entertainment). Reweight domains using scaling
+laws to get high downstream performance.
+
+At the end of training, overfit the model on very quality data
+
+Hugging Face, LLM Training Dataset 
+HTML page example
+Télécharger tout l’internet
+Montrer l’exemple de L’HTML
+
+4. Des liens qui montrent les mêmes sites du texte dupliqué
+5. 10 M de mots problématiques , 10 mot dans une page, problématique 
+6. Take all wikipedia, all links qui ref wiki sont aussi surement de bonnes pages car elles sont cités
+
+Quand le loss diminue on entraine sur des données de très grande qualités pour améliorer la pertinence
+
+Les modèles qu’on connait sont au alentour de 15 a 30 trillions tokens pour l’entrainement
+
+Scaling laws
+16
+I.A.6 Scaling Laws
+More ressources, more data and bigger models -> better models
+
+
+Jared Kaplan & Al, 2020, Scaling Laws for Neural Language Models 
+L relation Cmin / .. donne la pente de la courbe 
+On peut savoir comment un modèle performe selon ses caractéristiques d’entrée
+On peut imaginer comment un modèle va performer
+
+Personne ne fait d’epochs dans les entraînements
+
+
+Training process
+17
+I.A.7 Training Process
+Steps 
+
+Find scaling recipes (example: learning rate decrease if the size of the model increase)
+Tune hyper parameters on small models of differents size
+Choose the best models among the smallest ones
+Train the biggest model with the 
+
+
+Stanford CS229 I Machine Learning I Building Large Language Models (LLMs) [Youtube]
+Q. Should I use Transformers or LSTM ? 
+Avec 30 j d’entrainement que faire ? 
+1 modele sur 30 jours 
+30 modèle sur 1 j 
+
+
+
+Jordan Hoffmann & Al, 2023, Chinchilla, Training Compute-Optimal Large Language Models
+18
+I.A.8 Cost & Optimizations
+Display all the models with same amount of compute (left figure)
+Select the best model for each compute in terms of training loss (middle & right figure)
+Extrapolate to get the best model & data size for your compute (1.4T tokens and 63B param)
+Optimal model and data size
+Y Loss 
+X le nombre de parametres
+Different color different amon of computes 
+
+LLAMA 3B 400B 
+Approx cost 80M dollar
+
+19
+I.A.8 Cost & Optimizations
+LLAMA 3 400B cost approx. $80m
+
+Carbon emitted approx. 2K tickets Tunis - New York
+ 
+How much it costs ?
+Y Loss 
+X le nombre de parametres
+Different color different amon of computes 
+
+LLAMA 3B 400B 
+Approx cost 80M dollar
+
+20
+I.B Fine tuning Large Language Model
+Post training phase
+
+B. Fine tuning a Large Language Model
+Supervised Fine Tuning
+RLHF
+Reward model
+PPO & DPO
+Evaluation & Challenges
+
+
+Open AI, 2022, Aligning language models to follow instructions [Blog] 
+21
+I.B.A Supervised Fine Tuning
+“GPT-3 models aren’t trained to follow user instructions. 
+Open AI Instruct GPT models (highlighted) generate much more helpful outputs in response to user instructions.”
+ 
+How to get a user assistant ? 
+Predire la proba du prochain mot, compléter une phrase existante 
+
+22
+I.B.A Supervised Fine Tuning
+How to get a user assistant ? 
+Conversational Agent
+ChatGPT
+Pretrained Large 
+Language
+Model
+Post training: Alignement
+Predire la proba du prochain mot, compléter une phrase existante 
+
+23
+I.B.A Supervised Fine Tuning
+How to get a User Assistant from a Language Model ? 
+C. Wolfe, 2023, Understanding and Using Supervised Fine-Tuning (SFT) for Language Models [Blog] 
+Predire la proba du prochain mot, compléter une phrase existante 
+
+24
+I.B.A Supervised Fine Tuning
+Idea: take a LLM pre-trained (as explained in I.Building Large Language Models) and fine tune to respect human preferences with moderation
+
+ 
+Famous LLM follow user instructions with moderation
+Predire la proba du prochain mot, compléter une phrase existante 
+
+25
+I.B.A Supervised Fine Tuning
+Problem 1: Human Alignment - how to know the favorite answer for a human ? Costly to ask a human
+Solution: Use LLM to scale Data Collection at low cost
+
+
+ 
+Supervised Fine Tuning 
+How can we get the post training data ? 
+Alpaca: A Strong, Replicable Instruction-Following Model [Blog] 
+Predire la proba du prochain mot, compléter une phrase existante 
+
+26
+I.B.A Supervised Fine Tuning
+Problem 2: 52K instruction is nothing compared to the amount of data needed to train a LM
+Solution: A few data is required for SFT 
+ 
+Zhou & Al 2023, LIMA: Less Is More for Alignment
+Supervised Fine Tuning 
+How much data do we need ?
+En scale de 2k a 32K n’aide vraiment pas. 
+
+Pas évident de faire plaisir à chaque utilisateur d’internet avec ses préférence différentes. 
+On utilise la connaissance de la données d'entraînement et on essaye de fitter avec un type d’utillisateur 
+
+
+27
+I.B.A Supervised Fine Tuning
+Same process than the language model training
+
+How Supervised Fine Tuning Works ? 
+Open AI, 2022, Aligning language models to follow instructions [Blog] 
+Model
+Expl ain the moon lan ding to a 6 years old
+9140 820 19  354 3672 34 347 321  2903 224 9832
+
+3892
+Child 
+Some 👌 
+Loss
+En scale de 2k a 32K n’aide vraiment pas. 
+
+Pas évident de faire plaisir à chaque utilisateur d’internet avec ses préférence différentes. 
+On utilise la connaissance de la données d'entraînement et on essaye de fitter avec un type d’utillisateur 
+
+Different hyper parameters, 
+Increase learning rate from these examples
+
+
+28
+I.B.2 RLHF
+SFT Limitations: 
+
+Behavior cloning
+Human abilities to answer perfectly to a given question
+Hallucination if answer from human not in training data
+Data collection cost
+Reinforcement Learning from Human Feedback - RLHF
+SFT limites 
+
+Le LLM va vouloir reproduire la réponse de l’humain
+L’humain ne va pas générer toutes les réponses, limité par la réponse de l’humain
+
+Hallu: le modèle a sa connaissance dans ses données d'entraînement ? Que ce passe t’il si le LLM n’a pas la connaissance.
+Il Va halluciner a partir du SFT car l’humain lui a appris à générer une réponse qui n’est pas dans ses données 
+
+
+
+29
+I.B.2 RLHF
+Idea:
+
+From a question, generate multiples answers
+Ask a human to classify answers
+Train a reward model to learn these preferences
+
+Reward model: classifier that is trained to classify preferences from possibles answers 
+Reinforcement Learning from Human Feedback - RLHF
+Open AI, 2022, Aligning language models to follow instructions [Blog] 
+Classifier 
+Model
+SFT limites 
+
+Le LLM va vouloir reproduire la réponse de l’humain
+L’humain ne va pas générer toutes les réponses, limité par la réponse de l’humain
+
+Hallu: le modèle a sa connaissance dans ses données d'entraînement ? Que ce passe t’il si le LLM n’a pas la connaissance.
+Il Va halluciner a partir du SFT car l’humain lui a appris à générer une réponse qui n’est pas dans ses données 
+
+
+
+30
+I.B.3 Reward Model
+Also transformer based LM
+Variation in sizes used (relative to policy)
+Outputs scalar from input text
+
+
+Reward model
+Open AI, 2022, Aligning language models to follow instructions [Blog] 
+
+Classifier 
+Model
+SFT limites 
+
+Le LLM va vouloir reproduire la réponse de l’humain
+L’humain ne va pas générer toutes les réponses, limité par la réponse de l’humain
+
+Hallu: le modèle a sa connaissance dans ses données d'entraînement ? Que ce passe t’il si le LLM n’a pas la connaissance.
+Il Va halluciner a partir du SFT car l’humain lui a appris à générer une réponse qui n’est pas dans ses données 
+
+High logits dans la softmax = le modèle a une grande préférence pour une réponse
+Train le classifier pour dire si on préfère rouge ou vert. Au lieu d’utiliser le reward binaire, on utilise la logit continuet
+
+Regularization term pour éviter l’over optimization. Le reward model ne va pas la maximiser à l’infini. 
+
+
+31
+I.B.4 PPO & DPO
+Also transformer based LM
+Variation in sizes used (relative to policy)
+Outputs scalar from input text
+
+
+Training RL model
+Lambert, 2022, Illustrating Reinforcement Learning from Human Feedback (RLHF) [Blog]
+Prevent over optimization 
+SFT limites 
+
+Le LLM va vouloir reproduire la réponse de l’humain
+L’humain ne va pas générer toutes les réponses, limité par la réponse de l’humain
+
+Hallu: le modèle a sa connaissance dans ses données d'entraînement ? Que ce passe t’il si le LLM n’a pas la connaissance.
+Il Va halluciner a partir du SFT car l’humain lui a appris à générer une réponse qui n’est pas dans ses données 
+
+High logits dans la softmax = le modèle a une grande préférence pour une réponse
+Train le classifier pour dire si on préfère rouge ou vert. Au lieu d’utiliser le reward binaire, on utilise la logit continuet
+
+Regularization term pour éviter l’over optimization. Le reward model ne va pas la maximiser à l’infini. 
+
+On compare la réponse du modèle a modèle optimisé, au début pas du tout. 
+L’objectif est de forcer le modèle optimisé à utiliser une réponse syntaxiquement et sémantiquement juste. 
+Ensuite on récupère le reward de la réponse fournit par le modèle optimisé afin d’obtenir la préférence de l’humain. On obtient le reward issue de la KL qui sert d’ajustement du modèle optimisé. 
+
+Over optimisation
+
+LLM are actually a policy for a RL model 
+It not maximimzing maximum likelihood anymore 
+The reason why it’s important is that model that model that goes though this type of PPO don’t give you the likelihood of text that are meaningful. 
+You optimized them for generating the most likely things.
+
+
+32
+I.B.4 PPO & DPO
+PPO is much more complex (clipping, rollouts, outer loops) than in theory
+Maximize the desired output, minimize the other 
+
+DPO
+Rafael Rafailov, 2024, Direct Preference Optimization:. Your Language Model is Secretly a Reward Model Paper
+Equivalent to RLHF and LM policy using PPO
+
+Now only do maximum likelihood using DPO
+
+
+33
+I.B.5 Evaluation & Challenges
+RLHF gains
+Nisan Stiennon & Al, 2020, Learning to summarize from human feedback
+Dubois∗ & Al, 2024, Alpaca Farm: A Simulation Framework for Methods that Learn from Human Feedback
+
+SFT limites 
+
+Le LLM va vouloir reproduire la réponse de l’humain
+L’humain ne va pas générer toutes les réponses, limité par la réponse de l’humain
+
+Hallu: le modèle a sa connaissance dans ses données d'entraînement ? Que ce passe t’il si le LLM n’a pas la connaissance.
+Il Va halluciner a partir du SFT car l’humain lui a appris à générer une réponse qui n’est pas dans ses données 
+
+High logits dans la softmax = le modèle a une grande préférence pour une réponse
+Train le classifier pour dire si on préfère rouge ou vert. Au lieu d’utiliser le reward binaire, on utilise la logit continuet
+
+Regularization term pour éviter l’over optimization. Le reward model ne va pas la maximiser à l’infini. 
+
+
+34
+I.B.5 Evaluation & Challenges
+RLHF challenges
+Singhal & Al, 2024, A Long Way to Go: Investigating Length Correlations in RLHF
+Answer preference is not trivial
+RLHF increases answer size
+Humans do not agree (agree with themselves only 66% of the time)
+Human have lot of variance, model have no variance 
+Ask LLM preferences instead of human preferences
+
+Stanford CS229 I Machine Learning I Building Large Language Models (LLMs) [Youtube]
+SFT limites 
+
+Le LLM va vouloir reproduire la réponse de l’humain
+L’humain ne va pas générer toutes les réponses, limité par la réponse de l’humain
+
+Hallu: le modèle a sa connaissance dans ses données d'entraînement ? Que ce passe t’il si le LLM n’a pas la connaissance.
+Il Va halluciner a partir du SFT car l’humain lui a appris à générer une réponse qui n’est pas dans ses données 
+
+High logits dans la softmax = le modèle a une grande préférence pour une réponse
+Train le classifier pour dire si on préfère rouge ou vert. Au lieu d’utiliser le reward binaire, on utilise la logit continuet
+
+Regularization term pour éviter l’over optimization. Le reward model ne va pas la maximiser à l’infini. 
+
+
+35
+I.B.5 Evaluation & Challenges
+Evaluation
+Chatbot Arena, Open LM
+How to evaluate a model like Chat GPT ? 
+Different methods (DPO, PPO, SFT) can be compared
+Models are not calibrated
+A large diversity of evaluation to cover
+They don’t give distribution theyr are optimliszed for alinement 
+There is a large diversity of evaluation
+
+36
+I.B.5 Evaluation & Challenges
+OpenAI o1: “Streaming is dead, long live Chain of Thought”
+Open AI, 2024, Learning to Reason with LLMs [Blog] 
+“Our large-scale reinforcement learning algorithm teaches the model how to think productively using its chain of thought in a highly data-efficient training process. We have found that the performance of o1 consistently improves with more reinforcement learning (train-time compute) and with more time spent thinking (test-time compute). The constraints on scaling this approach differ substantially from those of LLM pretraining, and we are continuing to investigate them.”
+Chain of thought (COT)
+Increase test time compute
+On a vu que les scalings laws permettent de déterminer la taille des données et du modèles selon des ressources de compute. 
+Si on se base sur les ressources de compute pour fixer ces valeurs, c’est que le compute est très limité et difficilement accessible. 
+
+
+
+37
+I.B.5 Evaluation & Challenges
+OpenAI o1 vs GPT 4o
+Prompt: 
+From the following sentence: Transformers are encoder decoder models
+Apply the following steps: 
+- Create a manim code to display this sentence where each character has a different color 
+- Iterate through the sentence merging commons pairs as done n the Byte Pair Encoding system 
+- Change the colors of new pair
+- Continue until all commons pair are made 
+- Update at each step the manim code 
+- Edit the previous code to not keep one color after merging on the merge pair. The selected color should be the one with the highest number of letters
+- Edit the code at the final stage to change color if two adjacent different pair have same color
+Open AI o1
+GPT 4o
+On a vu que les scalings laws permettent de déterminer la taille des données et du modèles selon des ressources de compute. 
+Si on se base sur les ressources de compute pour fixer ces valeurs, c’est que le compute est très limité et difficilement accessible. 
+
+
+
+38
+Conclusion
+Conclusion
+Building GPT 3 
+
+Data preprocessing is a very important step to get quality data
+GPT 3 training consists of two phases (pre and post training)
+Supervised Fine Tuning is the first step of post training phase (ask a human to write the answer)
+RLHF helps the model to align with human preferences
+DPO is the new methods for Alignment, replacing RLHF
+
+General knowledges 
+
+Data size and model size depends on compute resources (Scaling Laws, Chinchilla). 
+OpenAI o1 improves efficiency with longer RLHF training and answer inference time (COT)
+
+ 
+
+“SFT+DPO approach seems to be the most popular preference tuning strategy at the moment due to the ease of use compared to other methods, such as RLHF with PPO.”
+Sebastian Raschka, 2024, New LLM Pre-training and Post-training Paradigms [Blog] 
+On a vu que les scalings laws permettent de déterminer la taille des données et du modèles selon des ressources de compute. 
+Si on se base sur les ressources de compute pour fixer ces valeurs, c’est que le compute est très limité et difficilement accessible. 
+
+
+
+39
+Conclusion
+Model
+Expl ain the moon lan ding to a 6 years old
+9140 820 19  354 3672 34 347 321  2903 224 9832
+
+3892
+Child 
+Some 👌 
+On verra ensuite comment fonctionne ce fameux modèle abstrait jusqu’ici
+
+
+
+40
+II. Transformers
+On a vu les différentes étapes d’entrainement d’un LLM comme GPT 3 mais on a pas vu l’architecture sous jacente. 
+
+On parlait de modèle à entrainer. Ajd on parle de Transformers 
+
+41
+II. Transformers
+A. Before Transformers 
+N grams
+Embeddings
+RNN 
+LSTM
+
+B. Transformers 
+Self Attention / Cross Attention
+Multi-Head Attention
+Residual connection & Layer normalization
+Feed forward layer
+Softmax Layer
+Positional Embeddings
+
+On a vu les différentes étapes d’entrainement d’un LLM comme GPT 3 mais on a pas vu l’architecture sous jacente. 
+
+On parlait de modèle à entrainer. Ajd on parle de Transformers 
+
+42
+II.A. Before Transformers 
+The Story of AI Evolution: Before ML Era to Transformers, GPT-3 and Beyond [LinkedIn] 
+A. Before Transformers 
+N grams
+Embeddings
+RNN 
+LSTM
+On a vu les différentes étapes d’entrainement d’un LLM comme GPT 3 mais on a pas vu l’architecture sous jacente. 
+
+On parlait de modèle à entrainer. Ajd on parle de Transformers 
+
+43
+II.A. Before Transformers 
+Our goal today
+Predict the word “models” from the input sentence
+
+Requirements:
+Find a way to transform word into numerical values
+Provide semantic relationship between the encoding words
+Provide context to our model to understand the sentence
+Provide long context to our model to understand the sentence
+Create a fast trainable model 
+
+
+
+Model
+Input: “Transformers are encoder decoder”
+Predict: “models”
+
+44
+II.A.1 N Grams
+N Grams
+
+Input text: 
+
+To Sherlock Holmes she is always the woman. I have seldom heard him mention her under any other name. In his eyes she eclipses and predominates the whole of her sex. It was not that he felt any emotion akin to love for Irene Adler. All emotions, and that one particularly, were abhorrent to his cold, precise but admirably balanced mind. He was, I take it …
+The chain rule of probability:  p(x1, x,2, …, xn) = p(x1) p(x2| x1) p(x3| x2,x1) …
+N-gram generator 
+Lena Voita, Language Modeling [Blog] 
+
+NGrams Limitation: 
+Finite context windows
+High computational demande when N and data size increase
+Data Sparsity
+
+
+45
+II.A.2 Embeddings
+Our goal today
+Predict the word “models” from the input sentence
+
+Requirements:
+Find a way to transform word into numerical values
+Provide semantic relationship between the encoding words
+Provide context to our model to understand the sentence
+Provide long context to our model to understand the sentence
+Create a fast trainable model 
+
+
+
+Model
+Input: “Transformers are encoder decoder”
+Predict: “models”
+
+46
+II.A.2 Embeddings
+Index
+Mot
+0
+a
+1
+the
+2
+he
+…
+…
+1280
+transformers
+1281
+embedding
+1282
+partial
+…
+…
+34567
+tunis
+34568
+dolphin
+0
+0
+0
+:
+1
+0
+0
+:
+0
+0
+-0.81
+:
+:
+:
+ 4.56
+:
+:
+:
+-4.35
+2.21
+Index: 1280
+Embedding model
+Semantic representation
+Dim = |Chosen embedding size| 
+
+
+One-hot encoding
+Dim = |Vocab Size| 
+
+
+From One-hot encoding to Word Embedding 
+Word Embedding 
+One-hot encoding 
+“transformers”
+
+47
+II.A.2 Embeddings
+Word Embedding (Word2Vec, GloVe, BERT, ELMo)
+Represent each word as a vector of numbers
+Convert a discrete representation to continuous, allowing:
+More ‘fine-grained’ representations of words
+Useful computations such as cosine / euclidean distances
+Visualization and mapping of words
+Tomas Mikolov, 2013, Efficient Estimation of Word Representations in Vector Space 
+
+48
+II.A.3 RNN
+Our goal today
+Predict the word “models” from the input sentence
+
+Requirements:
+Find a way to transform word into numerical values
+Provide semantic relationship between the encoding words
+Provide context to our model to understand the sentence
+Provide long context to our model to understand the sentence
+Create a fast trainable model 
+
+
+
+Model
+Input: “Transformers are encoder decoder”
+Predict: “models”
+
+49
+II.A.3 RNN
+Semantic representation
+Dim = |Chosen embedding size| = 100
+
+
+How to give a sentence to a model ? 
+-0.81
+ 4.56
+:
+-4.35
+2.21
+Embedding model
+“transformers”
+-0.02
+ 2.36
+:
+-1.12
+3.13
+Embedding model
+“are”
+D
+D
+-0.81
+ 4.56
+:
+-4.35
+2.21
+-0.81
+ 4.56
+:
+-4.35
+2.21
+D
+2
+D
+1
+⛔
+2 ≠1
+
+50
+II.A.3 RNN
+Seq2seq model
+
+51
+II.A.3 RNN
+Recurrent Neural Networks (Sequential Model)
+Advantages:
+Can learn from context of previous word
+Self supervised learning model
+
+
+Problems:
+Sequential model 
+Very short term memory 
+
+
+52
+II.A.3 RNN
+Recurrent Neural Networks (Seq2seq model)
+
+53
+II.A.3 RNN
+Recurrent Neural Networks (Seq2seq model)
+Briefly describe the architecture of a RNN [Blog] 
+Each word is given sequentially (xt)
+An intern memory is updated after each word  (ht)
+A context is provided with this memory
+
+
+54
+II.A.3 RNN
+RNN limitations: Exploding / Vanishing gradient problem
+“transformers”
+“are”
+“encoder”
+“decoder”
+“The”
+StatQuest with Josh Starmer [Youtube]
+Optimizing the loss w.r.t weights: 
+D. Barack Ore, 2020, The Exploding and Vanishing Gradients Problem in Time Series 
+“Models” ?
+W2 = 2 
+
+Input x 2 x 2 x 2 x 2 par couche 
+Input x 16
+
+Quand on met a jour les poids en backpropagation, les poids recoivent un update proportionnel au gradient with respect to le current poid du timestep
+Pour les permiers mots dans notre cas, les poids recoivent un update des tous les poiuds supérieur, à savoir une grosse value. 
+
+Le modèle devient instable
+
+55
+II.A.3 RNN
+RNN limitations: Exploding / Vanishing gradient problem
+“transformers”
+“are”
+“encoder”
+“decoder”
+“The”
+?
+“decoder”
+Feed forward + Softmax model
+
+
+
+
+
+
+
+
+
+
+W2 = 2 
+
+Input x 2 x 2 x 2 x 2 par couche 
+Input x 16
+
+Quand on met a jour les poids en backpropagation, les poids recoivent un update proportionnel au gradient with respect to le current poid du timestep
+Pour les permiers mots dans notre cas, les poids recoivent un update des tous les poiuds supérieur, à savoir une grosse value. 
+
+Le modèle devient instable
+
+56
+II.A.3 RNN
+RNN limitations: Exploding / Vanishing gradient problem
+“transformers”
+“are”
+“encoder”
+“decoder”
+“The”
+StatQuest with Josh Starmer Youtube
+“Models” ?
+W2 = 2 
+
+Input x 2 x 2 x 2 x 2 par couche 
+Input x 16
+
+Quand on met a jour les poids en backpropagation, les poids recoivent un update proportionnel au gradient with respect to le current poid du timestep
+Pour les permiers mots dans notre cas, les poids recoivent un update des tous les poiuds supérieur, à savoir une grosse value. 
+
+Le modèle devient instable
+
+57
+II.A.3 RNN
+RNN Types of architectures
+“transformers”
+“are”
+“encoder”
+“decoder”
+“The”
+StatQuest with Josh Starmer Youtube
+“Models” ?
+Praveen Raj, 2023, Understanding Recurrent Neural Networks (RNN) — NLP
+Q. Which one fit our use case ? 
+One to One
+This type of RNN behaves the same as any simple Neural network it is also known as Vanilla Neural Network. In this Neural network, there is only one input and one output.
+One To Many
+In this type of RNN, there is one input and many outputs associated with it. One of the most used examples of this network is Image captioning where given an image we predict a sentence having Multiple words.
+Many to One
+In this type of network, Many inputs are fed to the network at several states of the network generating only one output. This type of network is used in the problems like sentimental analysis. Where we give multiple words as input and predict only the sentiment of the sentence as output.
+Many to Many
+In this type of neural network, there are multiple inputs and multiple outputs corresponding to a problem. One Example of this Problem will be language translation. In language translation, we provide multiple words from one language as input and predict multiple words from the second language as output.
+
+
+
+58
+II.A.4 LSTM
+Our goal today
+Predict the word “models” from the input sentence
+
+Requirements:
+Find a way to transform word into numerical values
+Provide semantic relationship between the encoding words
+Provide context to our model to understand the sentence
+Provide long context to our model to understand the sentence
+Create a fast trainable model 
+
+
+
+Model
+Input: “Transformers are encoder decoder”
+Predict: “models”
+
+59
+II.A.4 LSTM
+Long Short Term Memory (LSTM)
+Both long and short term memory are provided
+
+“transformers”
+“are”
+“encoder”
+Colah, Understanding LSTM Networks [Blog] 
+RNN architecture
+LSTM architecture
+“transformers”
+“are”
+“encoder”
+
+60
+II.A.4 LSTM
+Long Short Term Memory (LSTM)
+“transformers”
+“are”
+“encoder”
+“decoder”
+“The”
+“models”
+Ct-1
+ht-1
+Colah, Understanding LSTM Networks [Blog] 
+
+61
+II.A.4 LSTM
+Long Short Term Memory (LSTM)
+Cell state to propagate long memory
+Gate defined by the sigmoid function
+0 = don’t pass information 
+1 = let everything pass through
+
+Colah, Understanding LSTM Networks [Blog] 
+Le LSTM a des gates pour réguler l’information transmise 
+Grace a une fonction sigmoid définie ici. 
+
+
+
+62
+II.A.4 LSTM
+Long Short Term Memory (LSTM)
+Colah, Understanding LSTM Networks [Blog] 
+“decoder”
+La première étape est de savoir ce qui est transmis pour la génération par rapport à l’information passée
+
+La cell state peut contenir le genre, la pluriel du mot à généré par exemple. 
+
+Si le mot de cette cellule est un point par exemple, on s’attend a ce que la cell state oublie pas les informations concernant la structure de la phrase par exemple pour que le prochain mot à générer ne soit pas érroné.
+
+63
+II.A.4 LSTM
+Long Short Term Memory (LSTM)
+Colah, Understanding LSTM Networks [Blog] 
+“decoder”
+Quelle nouvelle information veut on stocker dans le cell state qui représente l’information des anciens mots. On veut populer les informations du nouveaux mots par exemples. 
+
+La première porte avec la sigmoid indique quelles informations à conserver
+La seconde porte tanh indique doivent être ajouté 
+
+Par exemple on va vouloir oublier que le mot a transmettre est un nom et ajouter que le mot insérer est un nom au pluriels.
+
+64
+II.A.4 LSTM
+Long Short Term Memory (LSTM)
+Colah, Understanding LSTM Networks [Blog] 
+“decoder”
+On update maintenant le state: avec 
+
+F les informations oublié
+It les informations modifié 
+Les nouvelles informations 
+
+Ici on va transmettre les informations relative à la génération de notre mot models 
+
+65
+II.A.4 LSTM
+Long Short Term Memory (LSTM)
+Colah, Understanding LSTM Networks [Blog] 
+“decoder”
+Dernière étape, comment représenter le mot qui encode l’existant en se servant des information passé
+
+Decoder ici doit généré un vecteur qui comprendre qu’on parle d’un decoder au sens Transformers et non pas d’un decoder au sens Télévision. Il doit avoir aussi l’information d’un nom. Et aussi l’information que la phrase en au pluriel et impliquera la génération de models et non pas model
+
+66
+II.A.4 LSTM
+Long Short Term Memory (LSTM)
+What about Vanishing / Exploding Gradients ? 
+
+Colah, Understanding LSTM Networks [Blog] 
+The additive update function for the cell state gives a derivative that is much more ‘well behaved’
+The gating functions allow the network to decide how much the gradient vanishes, and can take on different values at each time step. The values that they take on are learned functions of the current input and hidden state.
+To get details on LSTM derivative, check out this blog post 
+
+La gate additive ici ainsi que les gates functions sont des paramètres supplémentaires à optimiser. 
+Le Modèle comprend de manière autonome que fixer des poids tout le temps haut ou bas entraine le vanishing exploding gradient car la loss est faible. 
+Il apprend donc a ajuster les autres paramètres du modèle, dont la forget gate pour la gérer
+
+67
+II.A.4 LSTM
+Our goal today
+Predict the word “models” from the input sentence
+
+Requirements:
+Find a way to transform word into numerical values
+Provide semantic relationship between the encoding words
+Provide context to our model to understand the sentence
+Provide long context to our model to understand the sentence
+Create a fast trainable model 
+
+
+
+Model
+Input: “Transformers are encoder decoder”
+Predict: “models”
+
+68
+II.B. Transformers Architecture
+
+69
+II.B. Transformers Architecture
+Introduction
+Self Attention / Cross Attention
+Multi-Head Attention
+Residual connection & Layer normalization
+Feed forward layer
+Softmax Layer
+Positional Embeddings
+
+
+
+70
+II.B Introduction
+Bahdanau & Al, 2016, Neural Machine Translation by Jointly Learning to Align and Translate
+Dans le decoding on est autoriser a regarder certains mot de l’encodeur
+
+C’est la première fois qu’on parle de recherche d’attention. 
+
+Context vector that comes from the encoder is the Weighted sum of the hidden state of the words in in the encoder  
+
+and the weight of this sum comes from the softmax based on this compatibility between the current state as you decoding and the hidden state in the encoding 
+
+
+
+
+71
+II.B Introduction
+
+72
+II.B Introduction
+
+73
+II.B. Introduction
+
+II.B. Introduction
+74
+GPT 3
+Each word is generated one by one
+Only the decoder part is used
+
+II.B. Introduction
+75
+Translation model (FR -> EN example)
+The sentence to translate given to the encoder
+Each generated word added to the decoder 
+Jay Allamar,  2019, The Illustrated Transformer
+
+76
+Lot of new knowledges in this paper:
+No more RNN, only attention 
+MLP layers and Attention
+Positional encodings
+ResNet structure
+Parallelism with Multi Head Attention
+
+
+II.B Introduction
+Dans le decoding on est autoriser a regarder certains mot de l’encodeur
+
+C’est la première fois qu’on parle de recherche d’attention. 
+
+Context vector that comes from the encoder is the Weighted sum of the hidden state of the words in in the encoder  
+
+and the weight of this sum comes from the softmax based on this compatibility between the current state as you decoding and the hidden state in the encoding 
+
+
+
+
+77
+II.B.  Transformers Architecture
+Introduction
+Self Attention / Cross Attention
+Multi-Head Attention
+Residual connection & Layer normalization
+Feed forward layer
+Softmax Layer
+Positional Embeddings
+
+
+
+78
+II.B.1 Self Attention Mechanism
+Transformers
+are
+encoder
+decoder
+Attention mechanism
+
+79
+II.B.1 Self Attention Mechanism
+Attention mechanism
+3 components: 
+
+Query: What am I looking for ? 
+Key: What do I have ?
+Value: What do I reveal to others ?
+
+Embedding
+Transformers
+80
+II.B.1 Self Attention Mechanism
+   are
+encoder
+decoder
+2.11
+-4.22
+..
+..
+5.93
+2.43
+-3.2
+..
+..
+3.32
+2.11
+-4.22
+..
+..
+1.12
+3.11
+-4.22
+..
+..
+4.98
+Query		
+2.11
+-4.22
+..
+..
+5.93
+2.11
+-4.22
+..
+..
+5.93
+2.11
+-4.22
+..
+..
+5.93
+2.11
+-4.22
+..
+..
+5.93
+3.23
+-1.23
+0.89
+0.32
+-3.29
+3.23
+1.23
+-2.34
+1.83
+1.92
+0.10
+1.28
+WQ
+E1
+E2
+E3
+Q1
+Q2
+Q3
+Q4
+Are we talking about TV ? 
+Do I mean Allocation de Retour à l’Emploi ?
+Am I a superstar ?
+…
+Query: What am I looking for ? 
+|E| : Embedding (1, 12 288)
+|WQ|: Query matrix (12 288, 128)
+
+81
+II.B.1 Self Attention Mechanism
+1.23
+-1.23
+0.89
+1.12
+2..29
+3.23
+-3.23
+-3.34
+2.83
+0.92
+1.10
+4.28
+WK
+Might be a TV object  of a model
+…
+I am a noun, starting the sentence
+I am a verb
+Key: What do I have ? 
+|E| : Embedding (1, 12 288)
+|WK|: Query matrix (12 288, 128)
+Embedding
+2.11
+-4.22
+5.93
+2.43
+-3.2
+3.32
+2.11
+-4.22
+1.12
+3.11
+-4.22
+4.98
+E1
+E2
+E3
+E4
+K1
+K2
+K3
+K4
+KEYS		
+-3.11
+2.422
+ 7.93
+2.11
+-3.22
+5.93
+2.11
+-1.2
+5.93
+-21
+42.21.2
+1.23
+
+Embedding
+Transformers
+82
+II.B.1 Self Attention Mechanism
+   are
+encoder
+decoder
+2.11
+-4.22
+5.93
+2.43
+-3.2
+3.32
+3.11
+-4.22
+4.98
+Query		
+2.11
+-4.22
+ 5.93
+2.11
+-4.22
+5.93
+2.11
+-4.22
+5.93
+2.11
+-4.22
+5.93
+3.23
+-1.23
+0.89
+0.32
+-3.29
+3.23
+1.23
+-2.34
+1.83
+1.92
+0.10
+1.28
+WQ
+E1
+E2
+E3
+Q1
+Q2
+Q3
+Q4
+Are we talking about TV ? 
+Do I mean Allocation de Retour à l’Emploi ?
+Am I a superstar ?
+…
+E4
+1.23
+-1.23
+0.89
+1.12
+2..29
+3.23
+-3.23
+-3.34
+2.83
+0.92
+1.10
+4.28
+WK
+Might be a TV object  of a model
+…
+I am a noun, starting the sentence
+…
+Embedding
+2.11
+-4.22
+5.93
+2.43
+-3.2
+3.32
+2.11
+-4.22
+1.12
+3.11
+-4.22
+4.98
+No we are not because I am a Transformer
+You should be a verb because I am a noun
+2.11
+-4.22
+1.12
+…
+…
+…
+…
+…
+…
+…
+…
+…
+…
+…
+…
+…
+…
+E1
+E2
+E3
+E4
+K1
+K2
+K3
+K4
+KEYS		
+-3.11
+2.422
+ 7.93
+2.11
+-3.22
+5.93
+2.11
+-1.2
+5.93
+-21
+42.21.2
+1.23
+
+Embedding
+Transformers
+83
+II.B.1 Self Attention Mechanism
+   are
+encoder
+decoder
+2.11
+-4.22
+5.93
+2.43
+-3.2
+3.32
+3.11
+-4.22
+4.98
+Query		
+2.11
+-4.22
+ 5.93
+2.11
+-4.22
+5.93
+2.11
+-4.22
+5.93
+2.11
+-4.22
+5.93
+3.23
+-1.23
+0.89
+0.32
+-3.29
+3.23
+1.23
+-2.34
+1.83
+1.92
+0.10
+1.28
+WQ
+E1
+E2
+E3
+Q1
+Q2
+Q3
+Q4
+E4
+1.23
+-1.23
+0.89
+1.12
+2..29
+3.23
+-3.23
+-3.34
+2.83
+0.92
+1.10
+4.28
+WK
+Embedding
+2.11
+-4.22
+5.93
+2.43
+-3.2
+3.32
+2.11
+-4.22
+1.12
+3.11
+-4.22
+4.98
+4
+70
+0
+85
+-4
+-10
+0
+0
+2
+0
+0
+0
+3
+-3
+4
+5
+2.11
+-4.22
+1.12
+E1
+E2
+E3
+E4
+K1
+K2
+K3
+K4
+KEYS		
+-3.11
+2.422
+ 7.93
+2.11
+-3.22
+5.93
+2.11
+-1.2
+5.93
+-21
+42.21.2
+1.23
+
+Embedding
+Transformers
+84
+II.B.1 Self Attention Mechanism
+   are
+encoder
+decoder
+2.11
+-4.22
+5.93
+2.43
+-3.2
+3.32
+3.11
+-4.22
+4.98
+Query		
+2.11
+-4.22
+ 5.93
+2.11
+-4.22
+5.93
+2.11
+-4.22
+5.93
+2.11
+-4.22
+5.93
+3.23
+-1.23
+0.89
+0.32
+-3.29
+3.23
+1.23
+-2.34
+1.83
+1.92
+0.10
+1.28
+WQ
+E1
+E2
+E3
+Q1
+Q2
+Q3
+Q4
+E4
+1.23
+-1.23
+0.89
+1.12
+2..29
+3.23
+-3.23
+-3.34
+2.83
+0.92
+1.10
+4.28
+WK
+Embedding
+KEYS		
+K1
+2.11
+-4.22
+5.93
+2.43
+-3.2
+3.32
+2.11
+-4.22
+1.12
+3.11
+-4.22
+4.98
+K2
+K3
+K4
+-3.11
+2.422
+ 7.93
+2.11
+-3.22
+5.93
+2.11
+-1.2
+5.93
+-21
+42.21.2
+1.23
+4
+70
+0
+85
+-4
+-10
+0
+0
+2
+0
+0
+0
+3
+-3
+4
+5
+2.11
+-4.22
+1.12
+E1
+E2
+E3
+E4
+
+85
+II.B.1 Self Attention Mechanism
+4
+70
+0
+85
+-4
+-10
+0
+0
+2
+0
+0
+0
+3
+-3
+4
+5
+Softmax
+4/128
+70/128
+0
+85/128
+
+-4/128
+-10
+0
+0
+2/128
+0
+0
+0
+3/128
+-3/128
+4/128
+
+5/128
+
+Q1.K1
+Q2.K1
+Q3.K1
+Q4.K1
+Q1.K2
+Q2.K2
+Q3.K2
+Q4.K2
+Q1.K3
+Q2.K3
+Q3.K3
+Q4.K3
+Q1.K4
+Q2.K4
+Q3.K4
+Q4.K4
+Q1
+Q2
+Q3
+Q4
+K1
+K2
+K3
+K4
+Q1.K1/√dk
+Q2.K1/√dk
+Q3.K1/√dk
+Q4.K1/√dk
+Q1.K2/√dk
+Q2.K2/√dk
+Q3.K2/√dk
+Q4.K2/√dk
+Q1.K3/√dk
+Q2.K3/√dk
+Q3.K3/√dk
+Q4.K3/√dk
+Q1.K4/√dk
+Q2.K4/√dk
+Q3.K4/√dk
+Q4.K4/√dk
+Q1
+Q2
+Q3
+Q4
+K1
+K2
+K3
+K4
+This step allows numerical stability 
+1
+0.97
+0.33
+0.85
+0
+0.03
+0.33
+0.02
+0
+0
+0.33
+0.02
+0
+0
+0
+0.11
+The sum of each column is 1 
+
+86
+II.B.1 Masking attention Mechanism
+This step allows numerical stability 
+Definition: the masking mechanism allows later words to not influence earlier words by setting lower left values by -∞
+4
+70
+0
+85
+-∞
+-10
+0
+0
+-∞
+-∞
+0
+0
+-∞
+-∞
+-∞
+5
+4/128
+70/128
+0
+85/128
+
+-∞
+-10
+0
+0
+-∞
+-∞
+0
+0
+-∞
+-∞
+-∞
+5/128
+
+1
+0.97
+0.33
+0.85
+0
+0.03
+0.33
+0.02
+0
+0
+0.33
+0.02
+0
+0
+0
+0.11
+Idea: A later word cannot answer question to a previous word because it is unknown at inference
+
+II.B.1 Self Attention Mechanism
+1x V1
+0.97 x V1
+0.33 x V2
+0.85 x V1
+0 x V2
+0.03 x V2
+0.33 x V2
+0.02  x V2
+
+0 x V3
+0 x V3
+0.33 x V3
+0.02x  V3
+
+0  x V4
+0 x V4
+0 x V4
+0.11 x V4
+
+Embedding
+Transformers
+   are
+encoder
+decoder
+2.11
+-4.22
+5.93
+2.43
+-3.2
+3.32
+3.11
+-4.22
+4.98
+E1
+E2
+E3
+E4
+2.11
+-4.22
+1.12
+Embedding
+2.11
+-4.22
+5.93
+2.43
+-3.2
+3.32
+2.11
+-4.22
+1.12
+3.11
+-4.22
+4.98
+E1
+E2
+E3
+E4
+V1
+V2
+V3
+V4
+VALUES		
+-3.11
+2.422
+ 7.93
+2.11
+-3.22
+5.93
+2.11
+-1.2
+5.93
+-21
+42.21.2
+1.23
+1.23
+-1.23
+0.89
+1.12
+2..29
+3.23
+-3.23
+-3.34
+2.83
+0.92
+1.10
+4.28
+Wv
+87
+
+Attention pattern
+z1
+z2
+z3
+z4
+II.B.1 Self Attention Mechanism
+Values: What do I reveal to others ?
+|E| : Embedding (1, 1512)
+|WV|: Value matrix (12 288, 12 288)
+ᐩ
+ᐩ
+ᐩ
+ᐩ
+88
+
+89
+II.B.2 Self Attention Mechanism
+Softmax
+Q1.K1
+Q2.K1
+Q3.K1
+Q4.K1
+Q1.K2
+Q2.K2
+Q3.K2
+Q4.K2
+Q1.K3
+Q2.K3
+Q3.K3
+Q4.K3
+Q1.K4
+Q2.K4
+Q3.K4
+Q4.K4
+Q1
+Q2
+Q3
+Q4
+K1
+K2
+K3
+K4
+Q1.K1/√dk
+Q2.K1/√dk
+Q3.K1/√dk
+Q4.K1/√dk
+Q1.K2/√dk
+Q2.K2/√dk
+Q3.K2/√dk
+Q4.K2/√dk
+Q1.K3/√dk
+Q2.K3/√dk
+Q3.K3/√dk
+Q4.K3/√dk
+Q1.K4/√dk
+Q2.K4/√dk
+Q3.K4/√dk
+Q4.K4/√dk
+Q1
+Q2
+Q3
+Q4
+K1
+K2
+K3
+K4
+This step allows numerical stability 
+4
+70
+0
+85
+-∞
+-10
+0
+0
+-∞
+-∞
+0
+0
+-∞
+-∞
+-∞
+5
+4/128
+70/128
+0
+85/128
+
+-∞
+-10
+0
+0
+-∞
+-∞
+0
+0
+-∞
+-∞
+-∞
+5/128
+
+1
+0.97
+0.33
+0.85
+0
+0.03
+0.33
+0.02
+0
+0
+0.33
+0.02
+0
+0
+0
+0.11
+
+II.B.2 Cross attention
+French to english translation example 
+
+No masking
+Embedding
+Transformers
+   are
+encoder
+decoder
+2.11
+-4.22
+5.93
+2.43
+-3.2
+3.32
+3.11
+-4.22
+4.98
+Query		
+2.11
+-4.22
+ 5.93
+2.11
+-4.22
+5.93
+2.11
+-4.22
+5.93
+2.11
+-4.22
+5.93
+E1
+E2
+E3
+Q1
+Q2
+Q3
+Q4
+E4
+Embedding
+2.11
+-4.22
+5.93
+2.43
+-3.2
+3.32
+2.11
+-4.22
+1.12
+3.11
+-4.22
+4.98
+70
+70
+0
+85
+-4
+35
+0
+0
+2
+0
+30
+0
+3
+-3
+4
+18
+…
+…
+…
+…
+2.11
+-4.22
+1.12
+E1
+E2
+E3
+E4
+K1
+K2
+K3
+K4
+KEYS		
+-3.11
+2.422
+ 7.93
+2.11
+-3.22
+5.93
+2.11
+-1.2
+5.93
+-21
+42.21.2
+1.23
+Transformers
+Les
+sont
+des
+…
+90
+
+II.B.2 Cross attention
+91
+
+II.B.1 Self Attention Mechanism
+Values: What do I reveal to others ?
+|E| : Embedding (1, 1512)
+|WV|: Value matrix (12 288, 12 288)
+Key: What do I have ? 
+|E| : Embedding (1, 12 288)
+|WK|: Query matrix (12 288, 128)
+Query: What am I looking for ? 
+|E| : Embedding (1, 12 288)
+|WQ|: Query matrix (12 288, 128)
+Embedding
+(Embedding Dimension, N words)
+(12 288, 50 257)
+49 152 params
+Key
+(Key size, Embedding Dimension)
+(128, 12 288)
+1 572 864 params per head
+Query
+(Query size, Embedding Dimension)
+(128, 12 288)
+
+1 572 864 params per head
+Value up
+(Value size, Embedding Dimension)
+(128, 12 288)
+1 572 864 params per head
+Value down
+(Embedding Dimension, Value size)
+(12 288, 128)
+1 572 864 params per head
+GPT 3 dimension for one attention head
+92
+
+II.B.1 Self Attention Mechanism
+Values: What do I reveal to others ?
+|E| : Embedding (1, 1512)
+|WV|: Value matrix (12 288, 12 288)
+Key: What do I have ? 
+|E| : Embedding (1, 12 288)
+|WK|: Query matrix (12 288, 128)
+Query: What am I looking for ? 
+|E| : Embedding (1, 12 288)
+|WQ|: Query matrix (12 288, 128)
+Embedding
+(Embedding Dimension, N words)
+(12 288, 4) 
+49 152 params
+Key
+(Key size, Embedding Dimension)
+(128, 12 288) x 96 heads
+150 994 944 params
+Query
+(Query size, Embedding Dimension)
+(128, 12 288) x 96 heads
+
+150 994 944 params
+Value up
+(Value size, Embedding Dimension)
+(128, 12 288)  x 96 heads
+150 994 944 params
+Value down
+(Embedding Dimension, Value size)
+(12 288, 128)  x 96 heads
+150 994 944 params
+GPT 3 dimension for all attention heads: 603 979 776 parameters 
+93
+
+II.B.1 Self Attention Mechanism
+Value Matrix (12 288, 12 288) decomposition≈
+1
+0.97
+0.33
+0.85
+0
+0.03
+0.33
+0.02
+0.8
+0.2
+0.3
+1.7
+-1.3
+3.2
+3.2
+0.32
+1.2
+0.23
+-2.3
+3.23
+0.32
+-4.31
+2.11
+0.12
+2.33
+-2.32
+0.23
+-0.23
+-1.76
+0.21
+0.92
+-0.12
+=
+12 288
+128
+128
+12 288
+12 288
+Idea: 
+The number of # is 150m for the Value matrix
+To avoid this high dimension and respects the 
+Force the Value matrix to be low rank
+12 288
+94
+
+II.B.1 Multi 
+Value Matrix (12 288, 12 288) decomposition
+1
+0.97
+0.33
+0.85
+0
+0.03
+0.33
+0.02
+0.8
+0.2
+0.3
+1.7
+-1.3
+3.2
+3.2
+0.32
+1.2
+0.23
+-2.3
+3.23
+0.32
+-4.31
+2.11
+0.12
+2.33
+-2.32
+0.23
+-0.23
+-1.76
+0.21
+0.92
+-0.12
+=
+12 288
+128
+128
+12 288
+12 288
+Idea: 
+The number of # is 150m for the Value matrix
+To avoid this high dimension and respects the 
+Force the Value matrix to be low rank
+12 288
+95
+
+II.B.1 Self Attention Mechanism
+Value Matrix (12 288, 12 288) decomposition
+1
+0.97
+0.33
+0.85
+0
+0.03
+0.33
+0.02
+0.8
+0.2
+0.3
+1.7
+-1.3
+3.2
+3.2
+0.32
+1.2
+0.23
+-2.3
+3.23
+0.32
+-4.31
+2.11
+0.12
+2.33
+-2.32
+0.23
+-0.23
+-1.76
+0.21
+0.92
+-0.12
+=
+12 288
+128
+128
+12 288
+12 288
+Idea: 
+The number of # is 150m for the Value matrix
+To avoid this high dimension and respects the 
+Force the Value matrix to be low rank
+12 288
+ .
+Wv
+96
+
+0.65
+0.3
+0.23
+0.4
+II.B.1 Self Attention Mechanism
+Value Matrix computation optimization
+1.2
+0.23
+-2.3
+3.23
+0.32
+-4.31
+2.11
+0.12
+2.33
+-2.32
+0.23
+-0.23
+-1.76
+0.21
+0.92
+-0.12
+ .
+12 288
+12 288
+E1
+ =
+0.32  	3.02 	…	-0.33
+12 288
+ =    V1
+
+0.62 x V1
+0.97 x V1
+0 x V2
+0.85 x V1
+0 x V2
+0.001 x V2
+0 x V2
+0.02  x V2
+
+0 x V3
+0 x V3
+0 x V3
+0.02x  V3
+
+0  x V4
+0 x V4
+0 x V4
+0.11 x V4
+
+Wv
+97
+
+II.B.1 Self Attention Mechanism
+Method 1 WV (12 288, 12 288)
+12 288
+0.62 x V1
+0.97 x V1
+0 x V2
+0.85 x V1
+0.1 x V2
+0.001 x V2
+0 x V2
+0.02  x V2
+
+0 x V3
+0 x V3
+0 x V3
+0.02x  V3
+
+0  x V4
+0 x V4
+0 x V4
+0.11 x V4
+
+0.62 x V1
+0.1 x V2
+0 x V3
+0  x V4
+ =
+0.1 x v21     0.1 x v22	        …	0.1 x v2, 12288
+12 288
++
+0.32 x 0.62      3.02 x 0.62	        …	-0.33 x 0.62
+ …
+Number of computations:
+N words x 12 288 multiplications
+N words x 12 288 additions
+
+98
+
+II.B.1 Self Attention Mechanism
+Method 1 WV (12 288, 128)
+128
+0.62 x V1
+0.97 x V1
+0 x V2
+0.85 x V1
+0.1 x V2
+0.001 x V2
+0 x V2
+0.02  x V2
+
+0 x V3
+0 x V3
+0 x V3
+0.02x  V3
+
+0  x V4
+0 x V4
+0 x V4
+0.11 x V4
+
+0.62 x V1
+0.1 x V2
+0 x V3
+0  x V4
+ =
+0.1 x v21     0.1 x v22	        …	0.1 x v2, 128
+128
++
+0.32 x 0.62      3.02 x 0.62	        …	-0.33 x 0.62
+ …
+Step 2:
+
+Number of computations:
+N words x 128 multiplications
+N words x 128 additions
+
+Matrix multiplication between value up matrix and result: 
+128 multiplication + 128 addition for each row
+12 288 times
+
+
+99
+
+100
+
+101
+II.B.  Transformers Architecture
+Introduction
+Self Attention / Cross Attention
+Multi-Head Attention
+Residual connection & Layer normalization
+Feed forward layer
+Softmax Layer
+Positional Embeddings
+
+
+
+102
+II.B.2 Multi-Head Attention
+Transformers
+are
+encoder
+decoder
+Attention mechanism
+
+z1
+z2
+z3
+z4
+II.B.2 Multi-Head attention
+ᐩ
+ᐩ
+ᐩ
+ᐩ
+Z
+z1
+z2
+z3
+z4
+N words
+ |V| (=128)
+103
+
+II.B.2 Multi-Head attention
+Concatenation
+
+…
+z1
+z10
+z96
+N words
+ |V| x N heads 
+= 128 x 96
+z1
+z2
+z3
+z96
+…
+104
+
+II.B.2 Multi-Head attention
+
+…
+z1
+z10
+z96
+N words
+ |V| x N heads 
+= 128 x 96
+x
+W0
+ |V| x N heads 
+| Embeddings Dim|
+N words
+| Embeddings Dim|
+Z
+105
+
+II.B.2 Multi-Head attention - Summary exercice
+Input sentence: Transformers are encoder decoder
+
+|Key Dim| = |Query Dim| = |Value Dim| = 3
+|Embedding Dim| = 5
+|N words| = 4
+				
+
+Transformers 
+
+are  
+
+encoder 
+
+decoder
+
+5
+WK0
+WQ0
+WV0
+Z0
+Q0
+V0
+3
+4
+4
+3
+5
+3
+4
+K0
+Step 1
+Step 2
+Step 3
+106
+
+II.B.2 Multi-Head attention - Summary exercice
+…
+WK0
+WQ0
+WV0
+WK96
+WQ96
+WV96
+Q96
+V96
+K96
+Q0
+V0
+K0
+…
+…
+Z0
+Z96
+Step 4
+107
+
+…
+Z0
+Z96
+W0
+4
+3
+4
+3
+3
+4 x 96
+4 x 96
+5
+Matmul
+4
+5
+II.B.2 Multi-Head attention - Summary exercice
+Step 5
+Z
+108
+
+4
+5
+II.B.2 Multi-Head attention - Summary exercice
+Z
+Why do Z and X have the same dimension ?
+Transformers 
+
+are  
+
+encoder 
+
+decoder
+
+5
+4
+X
+109
+
+110
+II.B.  Transformers Architecture
+Introduction
+Self Attention / Cross Attention
+Multi-Head Attention
+Residual connection & Layer normalization
+Feed forward layer
+Softmax Layer
+Positional Embeddings
+
+
+
+
+111
+II.B.3. Residual connections & Layer normalization
+
+II.B.3. Residual connections & Layer normalization
+Residual connections
+Residual connections mainly help mitigate the vanishing gradient problem
+Another effect of residual connections is that the information stays local in the Transformer layer stack
+ReLU
+y = max(x, 0)
+He & Al, 2015,  Deep Residual Learning for Image Recognition
+112
+Pendant la backpropagation, les signaux sont multiplié par la dérivée de la fonction d’activation. 
+Dans le cas de la RELU, une fois sur deux, la dérivée est à 0. La plupart des signés vont donc être à 0 et plus on repart dans les première couches, plus le signal est faible et la mise à jour des poids est inefficace. 
+La residual connection consiste à ajouter l’input du block précédent  par une somme. 
+Cette somme est linéaire par rapport au gradient et chaque block recoit dpnc un signal qui n’est pas impacté par le vanishing gradient car il ne contient pas toutes les dérivées successives. 
+
+Faire schema au tableau deep, shallow and residual LOSS
+
+Dans un autre sens, les residual connections donnent la garantie que la representation textuelle des tokens représente bien celle des tokens et que l’information reste local au niveau de chaque block
+
+II.B.3. Residual connections & Layer normalization
+ Layer normalization
+“Layer normalization is very effective at stabilizing the hidden state dynamics in recurrent networks. 
+Empirically, we show that layer normalization can substantially reduce the training time compared with previously published techniques.”
+Hinton & Al, 2016, Layer Normalization
+2020, In-layer normalization techniques for training very deep neural networks [Blog]
+113
+Pendant la backpropagation, les signaux sont multiplié par la dérivée de la fonction d’activation. 
+Dans le cas de la RELU, une fois sur deux, la dérivée est à 0. La plupart des signés vont donc être à 0 et plus on repart dans les première couches, plus le signal est faible et la mise à jour des poids est inefficace. 
+La residual connection consiste à ajouter l’input du block précédent  par une somme. 
+Cette somme est linéaire par rapport au gradient et chaque block recoit dpnc un signal qui n’est pas impacté par le vanishing gradient car il ne contient pas toutes les dérivées successives. 
+
+Faire schema au tableau deep, shallow and residual LOSS
+
+Dans un autre sens, les residual connections donnent la garantie que la representation textuelle des tokens représente bien celle des tokens et que l’information reste local au niveau de chaque block
+
+114
+So far …
+
+115
+II.B.  Transformers Architecture
+Introduction
+Self Attention / Cross Attention
+Multi-Head Attention
+Residual connection & Layer normalization
+Feed forward layer
+Softmax Layer
+Positional Embeddings
+Optimization 
+
+
+
+116
+II.B.4. Feed forward layer
+“In addition to attention sub-layers, each of the layers in our encoder and decoder contains a fully connected feed-forward network, which is applied to each position separately and identically. This consists of two linear transformations with a ReLU activation in between.”
+‘Up 
+projection’
+‘Down 
+projection’
+
+II.B.4. Feed forward layer
+Feed forward layer
+4
+5
+Z
+Transformers 
+
+are  
+
+encoder 
+
+decoder
+
+5
+4
+X
+117
+
+Transformers: “I am related to maths stuff, a plural noun, at the beginning of the sentence”
+
+Decoder: “I am before encoder, maybe related to maths, maybe an architecture
+
+II.B.4. Feed forward layer
+Feed forward layer
+4
+5
+Z
+Transformers 
+
+are  
+
+encoder 
+
+decoder
+
+5
+4
+X
+118
+
+Transformers: “I am related to maths stuff, a plural noun, at the beginning of the sentence”
+
+Decoder: “I am before encoder, maybe related to maths, maybe an architecture
+Residual connection + Layer Nom
+Feed forward
+Layer
+
+II.B.4. Feed forward layer
+Feed forward layer
+119
+4
+5
+
+Transformers: “I am related to maths stuff, a plural noun, at the beginning of the sentence”
+
+Decoder: “I am before encoder, maybe related to maths, maybe an architecture
+…
+…
+Am I a math architecture ?
+
+Am I a football star ?
+
+Am I a plural noun ?
+
+Feed forward network
+Feed forward network
+
+II.B.4. Feed forward layer
+Feed forward layer
+120
+4
+5
+
+Transformers: “I am related to maths stuff, a plural noun, at the beginning of the sentence”
+
+Decoder: “I am before encoder, maybe related to maths, maybe an architecture
+…
+…
+Feed forward network
+Am I a TV stuff ?
+
+Am I a singular noun ?
+
+Am I a math architecture ?
+
+
+II.B.4. Feed forward layer
+Feed forward layer : “Up projection”
+121
+Feed forward network
+Up projection dimension = 49 152 x embedding dimension 
+…
+49 152
+
+II.B.4. Feed forward layer
+122
+Another layer
+Down projection dimension = embedding dim x 49 152
+12 288
+Feed forward layer : “Down projection”
+
+II.B.4. Feed forward layer
+Embedding
+(Embedding Dimension, N words)
+(12 288, 50 257) 
+617 558 016  params
+Key
+(Key size, Embedding Dimension)
+(128, 12 288) x 96 heads
+150 994 944 params
+Query
+(Query size, Embedding Dimension)
+(128, 12 288) x 96 heads
+150 994 944 params
+Value up
+(Value size, Embedding Dimension)
+(128, 12 288)  x 96 heads
+150 994 944 params
+Value down
+(Embedding Dimension, Value size)
+(12 288, 128)  x 96 heads
+150 994 944 params
+Up Projection
+(Neuron Dim, Embedding Dimension)
+(49 152, 12 288) 
+603 979 776 params
+Down Projection
+(Embedding Dimension, Neuron Dim)
+(12 288, 49 152) 
+603 979 776 params
+Unembedding
+(N words, Embedding Dimension)
+(50 257, 12 288)
+617 558 016
+GPT 3 dimension per layer
+123
+
+II.B.4. Feed forward layer
+Embedding
+(Embedding Dimension, N words)
+(12 288, 50 257) 
+617 558 016 params
+Key
+(Key size, Embedding Dimension)
+(128, 12 288) x 96 heads x 96 layers
+14 495 514 624 params
+Query
+(Query size, Embedding Dimension)
+(128, 12 288) x 96 heads x 96 layers
+14 495 514 624 params
+Value up
+(Value size, Embedding Dimension)
+(128, 12 288)  x 96 heads  x 96 layers
+14 495 514 624 params
+Value down
+(Embedding Dimension, Value size)
+(12 288, 128)  x 96 heads  x 96 layers
+14 495 514 624 params
+Up Projection
+(Neuron Dim, Embedding Dimension)
+(49 152, 12 288)  x 96 layers
+
+57 982 058 496 params
+Down Projection
+(Embedding Dimension, Neuron Dim)
+(12 288, 49 152) x 96 layers
+57 982 058 496 params
+Unembedding
+(N words, Embedding Dimension)
+(50 257, 12 288)
+617 558 016 params
+GPT 3 dimension (96 layers):
+124
+
+125
+So far …
+
+126
+II.B.  Transformers Architecture
+Introduction
+Self Attention / Cross Attention
+Multi-Head Attention
+Residual connection & Layer normalization
+Feed forward layer
+Softmax Layer
+Positional Embeddings
+
+
+
+
+127
+II.B.5. Softmax Layer
+“Similarly to other sequence transduction models, we use learned embeddings to convert the input tokens and output tokens to vectors of dimension dmodel .
+
+We also use the usual learned linear transformation and softmax function to convert the decoder output to predicted next-token probabilities. 
+
+In our model, we share the same weight matrix between the two embedding layers and the pre-softmax linear transformation, similar to [30]. In the embedding layers, we multiply those weights by √ dmodel .”
+
+128
+II.B.5. Softmax Layer
+The input is he vector from the last word of the sentence 
+The output is the probability distribution over all words in the dictionary (50k words for GPT 3-
+On verra ensuite comment fonctionne ce fameux modèle abstrait jusqu’ici
+
+
+
+129
+II.B.5. Softmax Layer
+Q. Why don’t we take all the previous representations of the other vectors for the inference ?
+For training, each word/token is used for next word prediction. The model is trained to predict next word from only its previous word.
+Of course, the last word context is learned with attention
+decoder
+encoder
+are
+On verra ensuite comment fonctionne ce fameux modèle abstrait jusqu’ici
+
+
+
+130
+II.B.5 II.B.5. Softmax Layer - Temperature
+On verra ensuite comment fonctionne ce fameux modèle abstrait jusqu’ici
+
+
+
+II.B.5. Softmax Layer
+Embedding
+(Embedding Dimension, N words)
+(12 288, 50 257) 
+617 558 016 params
+Key
+(Key size, Embedding Dimension)
+(128, 12 288) x 96 heads x 96 layers
+14 495 514 624 params
+Query
+(Query size, Embedding Dimension)
+(128, 12 288) x 96 heads x 96 layers
+14 495 514 624 params
+Value up
+(Value size, Embedding Dimension)
+(128, 12 288)  x 96 heads  x 96 layers
+14 495 514 624 params
+Value down
+(Embedding Dimension, Value size)
+(12 288, 128)  x 96 heads  x 96 layers
+14 495 514 624 params
+Up Projection
+(Neuron Dim, Embedding Dimension)
+(49 152, 12 288)  x 96 layers
+
+57 982 058 496 params
+Down Projection
+(Embedding Dimension, Neuron Dim)
+(12 288, 49 152) x 96 layers
+57 982 058 496 params
+Unembedding
+(N words, Embedding Dimension)
+(50 257, 12 288)
+617 558 016 params
+GPT 3 dimension (96 layers):
+175 181 291 520 trainable parameters
+131
+
+132
+So far …
+
+133
+II.B.  Transformers Architecture
+Introduction
+Self Attention / Cross Attention
+Multi-Head Attention
+Residual connection & Layer normalization
+Feed forward layer
+Softmax Layer
+Positional Embeddings
+
+
+
+134
+II.B.6. Positional Embeddings
+“Since our model contains no recurrence and no convolution, in order for the model to make use of the order of the sequence, we must inject some information about the relative or absolute position of the tokens in the sequence. 
+To this end, we add "positional encodings" to the input embeddings at the bottoms of the encoder and decoder stacks. The positional encodings have the same dimension dmodel as the embeddings, so that the two can be summed.”
+That is, each dimension of the positional encoding corresponds to a sinusoid. The wavelengths form a geometric progression from 2π to 10000 · 2π. We chose this function because we hypothesized it would allow the model to easily learn to attend by relative positions, since for any fixed offset k, P Epos+k can be represented as a linear function of P Epos. We also experimented with using learned positional embeddings [9] instead, and found that the two versions produced nearly identical results (see Table 3 row (E)). We chose the sinusoidal version because it may allow the model to extrapolate to sequence lengths longer than the ones encountered during training.
+
+II.B.6. Positional Embeddings
+135
+Computations are not done sequentially (unlike RNN and LSTM)
+How to compare “A B C” and “C A B” ?
+
+Beneficial to find a method that satisfy the following points:
+
+Unambiguous (each position have its own value)
+Deterministic 
+Allows to estimate distance between tokens
+Works with longer sequence than seen during training
+
+
+Positional encoding
+Les encodages des séquences d'entrée et de sortie sont concaténés avec des encodages positionnels. Ces codages injectent des informations sur les positions relatives des éléments de la séquence.
+
+each position have its own value
+Deterministic, representable par une loi avec des relations entre les positions
+
+It could be nice for the model to know how far to token are for each others
+
+Generalization to long sequence 
+
+II.B.6. Positional Embeddings
+136
+Same size embedding to represent position (computationnaly for efficient that concatenation and model size increase)
+Don’t want to allow the model to extract information about positional informations only. Have to be coupled with word meaning
+
+Where:
+pos is the position {1, …, context length}
+i is the dimension = {1, …, dmodel }
+dmodel is the embedding dimension (GPT 3 = 12 288)
+Positional encoding
+Les encodages des séquences d'entrée et de sortie sont concaténés avec des encodages positionnels. Ces codages injectent des informations sur les positions relatives des éléments de la séquence.
+
+each position have its own value
+Deterministic, representable par une loi avec des relations entre les positions
+
+It could be nice for the model to know how far to token are for each others
+
+Generalization to long sequence 
+
+II.B.6. Positional Embeddings
+137
+Positional encoding
+Les encodages des séquences d'entrée et de sortie sont concaténés avec des encodages positionnels. Ces codages injectent des informations sur les positions relatives des éléments de la séquence.
+
+II.B.6. Positional Embeddings
+138
+Properties
+
+
+
+The positional values are unique if at least one function has maximum size of this sequence (context window) 👌
+The positional values are not random, created using two equations 👌
+Looking at frequencies, we can estimate distance between positions. For positions near to each other, we can use high frequency functions. For long distance position, we can use function with larger periods.  👌
+Since sin and cosine are periodic functions, the model can generalize for longer sequences 👌
+
+
+Positional encoding
+Les encodages des séquences d'entrée et de sortie sont concaténés avec des encodages positionnels. Ces codages injectent des informations sur les positions relatives des éléments de la séquence.
+
+each position have its own value
+Deterministic, representable par une loi avec des relations entre les positions
+
+It could be nice for the model to know how far to token are for each others
+
+Generalization to long sequence 
+
+II.B.6. Positional Embeddings
+139
+Kazemnejads, 2019, Transformer Architecture: The Positional Encoding [Blog]
+“We chose this function because we hypothesized it would allow the model to easily learn to attend by relative positions, since for any fixed offset k, PEpos+k can be represented as a linear function of PEpos.”
+Positional encoding
+Les encodages des séquences d'entrée et de sortie sont concaténés avec des encodages positionnels. Ces codages injectent des informations sur les positions relatives des éléments de la séquence.
+
+each position have its own value
+Deterministic, representable par une loi avec des relations entre les positions
+
+It could be nice for the model to know how far to token are for each others
+
+Generalization to long sequence 
+
+II.B.6. Positional Embeddings
+140
+Kazemnejads, 2019, Transformer Architecture: The Positional Encoding [Blog]
+Figure: Positional encoding representation
+Each row represent a positional vector for a given token 
+Positional encoding
+Les encodages des séquences d'entrée et de sortie sont concaténés avec des encodages positionnels. Ces codages injectent des informations sur les positions relatives des éléments de la séquence.
+
+each position have its own value
+Deterministic, representable par une loi avec des relations entre les positions
+
+It could be nice for the model to know how far to token are for each others
+
+Generalization to long sequence 
+
+141
+So far …
+
+142
+II. Resources
+Blogs:
+
+The Illustrated Transformer
+Transformers Explained Visually (Part 3): Multi-head Attention, deep dive
+
+Papers:
+Attention is All You Need
+
+Videos:
+Visual introduction to Transformers (part 1)
+Transformers visualized (part 2)
+How might LLMs store fact (part 3)
+Residual Network and skip connections
+Stanford CS25: V2 I Introduction to Transformers w/ Andrej Karpathy
+
+
+
+
+On verra ensuite comment fonctionne ce fameux modèle abstrait jusqu’ici
+
+
+
+143
+III. Retrieval Augmented Generation
+Basic Architecture
+Information retrieval 
+Vectorstore & Search optimization
+RAG Techniques
+Evaluation
+Multimodal RAG
+SOTA RAG architectures
+
+
+
+
+
+III. Introduction
+144
+LLM vs RAG
+LLM
+RAG
+
+III. Introduction
+145
+Definition: Retrieval-Augmented Generation (RAG) is a framework that combines retrieval-based and generation-based models. It enhances the capabilities of language models by providing them with access to external knowledge bases or documents during the generation process. This allows the model to generate more accurate and up-to-date information by retrieving relevant data instead of relying solely on its internal parameters.
+
+Benefits:
+	•	Produces more informed and factual responses.
+	•	Can handle queries about recent events not present in the training data.
+	•	Reduces hallucinations common in language models.
+
+
+
+RAG Definition
+
+III.1. Basic Architecture
+146
+RAG Architecture
+Construire son RAG (Retrieval Augmented Generation) grâce à langchain: L’exemple de l’Helpdesk d’OCTO 
+Step 1: Document ingestion
+Step 2: Contextualized answering
+
+III.1. Basic Architecture
+147
+RAG Architecture
+
+III.1. Basic Architecture
+148
+RAG Architecture
+
+III.1. Basic Architecture
+149
+How to ?
+
+III.2. Information retrieval 
+150
+TF-IDF
+Text Search using TF-IDF and Elasticsearch
+Given a query Q, containing keywords {q1, …, qn}, the BM25 score of a document D is:
+
+BM 25
+f(qi,D) is the number of times that the keyword qi occurs in the document D, 
+|D| is the length of the document D in words
+avgdl is the average document length in the text collection from which documents are drawn. 
+K1 and b are free parameters, usually chosen, in absence of an advanced optimization, as K1∈[1.2,2.0] and b=0.75
+N is the total number of documents in the collection, and 
+n(qi) s the number of documents containing qi
+
+III.2. Information retrieval 
+151
+Cosine Similarity
+Euclidean distance
+
+III.2. Information retrieval 
+152
+The Use of MMR, Diversity-Based Reranking for Reordering Documents and Producing Summaries
+Maximal Marginal Relevance
+The goal of this metric is to retrieve dissimilar documents and increase diversity
+
+D is the set of all candidate documents, R is the set of already selected documents, q is the query
+Sim1 is the similarity function between a document and the query
+Sim2 is the similarity function between two documents.  
+di and  dj are documents in D and R respectively
+
+The parameter λ (mmr_threshold) controls the trade-off between relevance (the first term) and diversity (the second term). If mmr_threshold is close to 1, more emphasis is put on relevance, while a mmr_threshold close to 0 puts more emphasis on diversity.
+
+
+III.2. Information retrieval 
+153
+Sparse vs Dense retrieval 
+Sparse Retrieval (TF IDF, BM 25, …) are methods to retrieve similar documents based on keywords only. 
+Dense Retrieval (Cos Sim, Euclidean distance) allows to retrieve document using semantic embedding representation of documents and query. 
+
+Hybrid Search is a method involving both sparse and dense retrievers to provide both advantages of the two approaches
+Sparse embedding (lots of 0)
+Q. If I want to retrieve document based on the user query ‘LeCun Meta’, what kind of retriever do I use ? 
+Q. If I want to retrieve document based on the user query ‘What are the most wonderful shots of Lebron James ?’, what kind of retriever do I use ? 
+Q. If I want to retrieve document based on the user query ‘What is the capital city of the biggest city in the world ?’, what kind of retriever do I use ? 
+
+III.2. Information retrieval 
+154
+Sparse Lexical and Expansion (SPLADE)
+SPLADE for Sparse Vector Search Explained
+Vector database are super efficient compare to Splade at the moment
+With sparse methods, you cannot get synonyms from a words.
+
+SPLADE:
+Use Bert to get similar words like synonyms
+Provide these synonyms to a sparse methods 
+
+Formal & Al, 2021, SPLADE V2
+
+III.2. Information retrieval 
+155
+Deep Bidirectional Language-Knowledge Graph Pretraining (DRAGON)
+Lin & Al, 2023, How to Train Your DRAGON
+Dense retriever
+Progressive Data Augmentation strategy for training sampling very difficult negatives
+
+Yasunaga, 2023, DRAGON: Training a Foundation Model from Text and Knowledge Graph [Blog]
+We first sample pairs of text segments and relevant KG subgraphs to create inputs for the model (Step 1). We then use a deep bidirectional model to fuse the input text and KG (Step 2), and finally pretrain the model using a joint self-supervised task over the two modalities (Step 3).
+
+III.2. Information retrieval 
+156
+Best retrieval methods
+Leaderboard for best Information Retrieval methods: https://eval.ai/web/challenges/challenge-page/1897/leaderboard/4475 
+
+
+
+
+
+
+III.3. Vectorstore & Search optimization
+157
+Vector Database 
+Definition: A vector database is a specialized database designed to store, manage, and query high-dimensional vector embeddings of data such as text, images, or other content types. 
+These embeddings are numerical representations produced by machine learning models that capture the semantic meaning of the data.
+
+Vector DB Comparison
+
+III.3. Vectorstore & Search optimization
+158
+Efficient similarity search
+Announcing ScaNN: Efficient Vector Similarity Search
+Scalable Nearest Neighbors (ScaNN) - Google
+Facebook AI Similarity Search (FAISS)
+Hierarchical Navigable Small Worlds (HNSW)
+
+
+Definition:
+ScaNN, FAISS and HNSW are methods for retrieving similar embeddings based on vector quantization and ANN search instead of full scan search.
+Hierarchical Navigable Small Worlds (HNSW) [Blog]
+
+III.3. Vectorstore & Search optimization
+159
+Reciprocal Rank Fusion (RRF)
+Definition:
+RRF allows to merge results of different retrievers
+
+III.3. Vectorstore & Search optimization
+160
+Reranker
+
+A reeranker rerank retrieved documents after a first similarity search
+
+Reranker type:
+Cross-Encoders
+Neural Rerankers
+
+Benefits of Using a Reranker:
+Increased Accuracy: Improves the likelihood that the most relevant information is used in generating the response.
+Better Contextual Understanding: Helps the system understand subtle nuances in the query.
+
+Challenges:
+Computational Overhead: Additional processing can increase response time.
+Resource Intensive: Advanced models require significant computational resources.
+
+
+
+Bi Encoder vs Cross Encoder
+
+III.4. RAG Techniques
+161
+Query augmentation
+Luyu Gao & Al, 2022 Precise Zero-Shot Dense Retrieval without Relevance Labels
+Definition: query augmentation refers to the process of enhancing or expanding the user’s original query to improve the retrieval of relevant documents or information from a knowledge base. 
+By augmenting the query, the system aims to retrieve more comprehensive and pertinent data, which can then be used to generate more accurate and informative responses.
+
+HyDE: Generate a fake answer from a query to improve information retrieval
+
+III.4. RAG Techniques
+162
+Query rephrasing
+Query rephrasing can be used to rephrase the query from the conversation history 
+
+
+III.4. RAG Techniques
+163
+Lost In the Middle
+Retrieved context provided at the beginning or the end of the prompt have more impact on the answer
+
+
+
+
+LangChain, Long Context Reorder [Blog]
+F. Liu & Al, 2023, Lost in the Middle: How Language Models Use Long Contexts
+
+III.4. RAG Techniques
+164
+Open AI, Prompt engineering
+Prompt Engineering
+Write clear instructions
+Provide reference text
+Split complex tasks into simpler subtasks
+Give the model time to "think"
+Use external tools (RAG)
+
+Tactic:
+Ask the model to adopt a persona
+Use delimiters to clearly indicate distinct parts of the input
+Specify the steps required to complete a task
+Provide examples
+Specify the desired length of the output
+
+
+III.4. RAG Techniques
+165
+Document Loader
+Load any type of document (PDF, PPT(x), DOC(x), XLS(x)
+
+Unstructured: https://unstructured.io/ 
+LLama Parse: https://llamahub.ai/l/readers/llama-index-readers-llama-parse?from=readers 
+
+III.4. RAG Techniques
+166
+Context 
+Definition: The context size refers to the maximum number of tokens (words or subword units) that the model can process in a single input sequence. It determines how much textual information the model can consider at once when generating responses or predictions.
+A larger context size allows the model to capture longer dependencies and understand more extensive context within the input, leading to more coherent and relevant outputs.
+A smaller context size limits the amount of information the model can utilize from the input text.
+Variable Sequence Length Training for Long-Context Large Language Models
+
+III.4. RAG Techniques
+167
+Chunking
+Announcing ScaNN: Efficient Vector Similarity Search
+To avoid context limitations, we can do document chunking:
+
+Chunk by document if the document is small 
+Chunk by title or header if the document is big 
+
+
+
+III.4. RAG Techniques
+
+168
+RAG Frameworks in Python
+Langchain 
+LlamaIndex 
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+III.4. RAG Techniques
+169
+Cloud services
+Cloud Services provide:
+A Secure environment 
+Enough compute to train big models
+Product as a Service (PaaS)
+LLMs APIs
+Vector Store management
+Efficient Retrieval
+Monitoring tools
+…
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+III.5. Evaluation
+170
+Retriever Evaluation: Precision & Recall @ k
+Precision @k
+How many  retrieved documents are relevant ?
+Recall @k
+How many  relevant documents are retrieved ?
+
+III.5. Evaluation
+171
+Retriever Evaluation : NDCG
+NDCG can take values from 0 to 1. 
+
+NDCG equals 1 in the case of ideal ranking when items are perfectly sorted by relevance. 
+NDCG equals 0 when there are no relevant objects in top-K.
+NDCG can be between 0 and 1 in all other cases. The higher the NDCG, the better. 
+
+
+
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+III.5. Evaluation
+172
+Answer Evaluation: LLM As a judge
+RAGAS
+Ask an LLM to evaluate answer quality: 
+
+Does my answer answer to the question ? 
+Does my answer used information from the context ? 
+Does my answer give enough facts ?
+…
+
+
+BLEU, ROUGE, Perplexity are not ideal for RAG use case. 
+
+
+Evaluating answers in RAG is not easy
+
+
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+III.6. Multimodal RAG
+173
+Multimodal
+Berrios & Al, 2023, Towards Language Models That Can See: Computer Vision Through the LENS of Natural Language
+Multimodal LLM: LLM capable of processing and understanding multiple types (or “modes”) of input data, such as text, images, audio, video, and other sensory inputs, in a unified manner.
+
+Exemple: GPT 4o, Gemini 1.5, Qwen2- VL
+
+
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+III.6. Multimodal RAG
+174
+Multimodal: Qwen2- VL
+Berrios & Al, 2023, Towards Language Models That Can See: Computer Vision Through the LENS of Natural Language
+Outperform GPT 4o on most of the benchmarks
+
+Multimodal Rotary Position (M-ROPE): “By deconstructing the original rotary embedding into three parts representing temporal and spatial (height and width) information，M-ROPE enables LLM to concurrently capture and integrate 1D textual, 2D visual, and 3D video positional information.”
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+III.6. Multimodal RAG
+175
+Rotary Embedding (ROPE)
+Su & AL, 2023, RoFormer: Enhanced Transformer with Rotary Position Embedding
+Rotary Position Embedding, or RoPE, is a type of position embedding which encodes absolute positional information with rotation matrix and naturally incorporates explicit relative position dependency in self-attention formulation. 
+
+Unlike traditional position embeddings, which add fixed vectors to represent positions, RoPE encodes positional information directly into the attention mechanism by rotating the query and key vectors in the Transformer architecture. This approach allows the model to better handle long-range dependencies while maintaining the flexibility of the attention mechanism.
+
+Properties:
+Flexibility of being expand to any sequence lengths
+Decaying inter-token dependency with increasing relative distances
+Capability of equipping the linear self-attention with relative position encoding.
+
+
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+III.6. Multimodal RAG
+176
+Multimodal RAG
+LangChain, Multi-Vector Retriever for RAG on tables, text, and images
+Option 1:  Store raw image using multimodal embedding. Retrieve images based on multimodal embedding similarity. Provide the raw image to the generator.
+
+Option 2:  Store the summary of the image using a multimodal LLM. Retrieve images based on its summary embedding. Provide the summary to the generator.
+
+Option 3:  Store the image and its summary using a multimodal LLM. Retrieve images based on its summary embedding. Provide the image to the generator.
+
+
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+III.6. Multimodal RAG
+177
+Multimodal RAG
+Yasunaga & Al, 2023, Retrieval-Augmented Multimodal Language Modeling
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+III.7. SOTA RAG architectures
+178
+Self-RAG 
+Ahmed, 2024, SELF-RAG (Self-Reflective Retrieval-Augmented Generation): The Game-Changer in Factual AI Generation [Blog]
+Generates multiple possible response segments in parallel, utilizing the retrieved documents as context.
+The model ranks the generated segments based on their critique scores, selecting the most accurate and relevant segment as the final output.
+This selection process ensures that the response is both factually correct and contextually appropriate.
+Asai & Al, 2023, Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+III.7. SOTA RAG architectures
+179
+RAPTOR
+Ahmed, 2024, SELF-RAG (Self-Reflective Retrieval-Augmented Generation): The Game-Changer in Factual AI Generation [Blog]
+RAPTOR recursively summarizes retrieved documents. Instead of processing the full text of multiple documents directly, it creates concise summaries that retain the most important information at each recursive step. 
+This hierarchy of summaries reduces the amount of information that needs to be processed while preserving the context and key facts from the original documents.
+Sarthi  & AL, 2024, RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+III.7. SOTA RAG architectures
+180
+Corrective RAG (CRAG)
+Yan & Al, 2024, Corrective Retrieval Augmented Generation
+Add a retrieval evaluator based on the quality of retrieved sources
+If sources are considered as incorrect, or ambiguous, augment or replace the context by a Web Search query 
+Un seul choix est tiré correct ambiguous ou incrorrect pour tous les docs
+Si ils sont tous au dessus d’un seuil , aucun au dessus vs entre les deux 
+
+III.7. SOTA RAG architectures
+181
+GraphRAG
+Microsoft, 2024, GraphRAG: Unlocking LLM discovery on narrative private data
+The LLM processes the entire private dataset, creating references to all entities and relationships within the source data, which are then used to create an LLM-generated knowledge graph. 
+This graph is then used to create a bottom-up clustering that organizes the data hierarchically into semantic clusters. This partitioning allows for pre-summarization of semantic concepts and themes, which aids in holistic understanding of the dataset. 
+At query time, both of these structures are used to provide materials for the LLM context window when answering a question. 
+
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+III. Conclusion
+182
+Conclusion
+Simple RAG: Encodes document content into a vector store, enabling quick retrieval of relevant information to enhance model responses.
+Context Enrichment: Adds surrounding context to each retrieved chunk, improving the coherence and completeness of the returned information.
+Multi-faceted Filtering: Applies various filtering techniques (metadata, similarity thresholds etc.) to refine and improve the quality of retrieved results.
+Fusion Retrieval: Combines vector-based similarity search with keyword-based retrieval to improve document retrieval.
+Intelligent Reranking: Reassesses and reorders initially retrieved documents to ensure that the most pertinent information is prioritized for subsequent processing.
+Query Transformation: Modifies or expands the original query with query rewriting, step-back prompting and sub-query decomposition.
+Hierarchical Indices: First identifies relevant document sections through summaries, then drills down to specific details within those sections.
+Hypothetical Questions: HyDE transforms queries into hypothetical documents that contain answers, bridging the gap between query and document distributions in vector space.
+Choose Chunk Size: Selects an appropriate fixed size for text chunks to balance context preservation and retrieval efficiency.
+Semantic Chunking: Unlike traditional methods that split text by fixed character/word counts, semantic chunking creates more meaningful, context-aware segments.
+Context Compression: Compresses and extracts the most pertinent parts of documents in the context of a given query.
+Explainable Retrieval: Not only retrieves relevant documents based on a query but also provides explanations for why each retrieved document is relevant.
+Retrieval w/ Feedback: Utilizes user feedback on the relevance and quality of retrieved documents and generated responses to fine-tune retrieval and ranking models.
+
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+III. Conclusion
+183
+Conclusion
+
+Adaptive Retrieval: Classifies queries into different categories and uses tailored retrieval strategies (factual, analytical, contextual etc.) for each, considering query context and preferences.
+Iterative Retrieval: Analyzes initial results and generates follow-up queries to fill in gaps or clarify information.
+Ensemble Retrieval: Applies different embedding models or retrieval algorithms and uses voting or weighting mechanisms to determine the final set of retrieved documents.
+Graph RAG= Retrieves entities and their relationships from a knowledge graph relevant to the query, combining with unstructured text for more informative responses.
+Multimodal: Integrates models that can retrieve and understand different data modalities, combining insights from text, images, and more.
+RAPTOR: Uses abstractive summarization to recursively process and summarize retrieved documents, organizing the information in a tree structure for hierarchical context.
+Self RAG: Multi-step process integrating decision, document retrieval, relevance filtering and generative feedback for more powerful model responses.
+Corrective RAG: Dynamically evaluates and corrects the retrieval process, combining vector databases, feedback, and models to improve responses.
+Few shot examples: Provides a few examples in the prompt to help the LLM understand the desired output
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+184
+IV. Tools and Agent
+Tools
+Agent
+
+
+
+
+
+
+
+IV.1.  Tools
+185
+Tools
+Shick & Al, 2023, Toolformer: Language Models Can Teach Themselves to Use Tools
+Le plus un doc importnat est bas le moins il a de poids
+
+IDCG est le parfait ranking 
+
+186
+IV. Tools and Agent
+Tools
+Agent
+
+
+
+
+
+
+
+Module Overview:
+187
+Rappels
+méthodes de similarités, Cos, MMR, RRF, 
+HNSW, SCANN
+RNN LSTM
+L’histoire des Transformers
+Transformer & Foundations models: Alexandre Allauzen, Anna Pappa
+LLM
+RLHF & alignment
+PPO
+Utilisation des LLMs → LANGCHAIN
+Context & Tokens
+Prompt Engineering
+Approches RAG, CRAG, GraphRAG
+HyDE, CrossEncoder, Reranker, 
+Agents
+Les processus d’évaluations
+Approches de fine tuning, LORA, Quantization, HF Hub
+Ouverture modèles de diffusions
+ TGI has many SOTA techniques for decoding: Paged Attention, KV Caching and Flash Attention…
+https://lnkd.in/e7BpXDqW 
+
+Projet chatbot, vidéo summarizer, agent, … 
+
+188
+Transformers
+
+189
+https://arxiv.org/pdf/2205.14135

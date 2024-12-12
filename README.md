@@ -35,3 +35,27 @@ pip install -r requirements.txt
 ```bash
 
 
+GenAI-Dauphine-Course
+
+### Description
+Ce projet est dédié aux travaux pratiques du cours d'IA Générative à Dauphine Tunis. Il se concentre sur l'apprentissage des concepts fondamentaux de l'IA générative.
+
+### Prérequis
+- VS Code
+- Python 3.11
+- Jupyter Notebook
+- Git
+- Anaconda/Miniconda
+
+### Installation
+```bash
+git clone https://github.com/BastinFlorian/GenAI-Dauphine-Course.git
+conda create --name genai python=3.11
+conda activate genai
+pip install -r requirements.txt
+```
+
+### Structure du Projet
+- `data/` : Données utilisées dans les exercices
+- `exercices/` : Ensemble des travaux pratiques
+- `docs/` : Documentation du projet

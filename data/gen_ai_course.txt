@@ -1,7 +1,7 @@
 Generative AI with LLM
 Florian Bastin
-👨🏼‍🎓 Master MASH - Université PSL
-👨🏼‍💻 LLM Engineer @OctoTechnology
+ Master MASH - Université PSL
+ LLM Engineer @OctoTechnology
 Le Monde, Casino, Channel, Club Med, Pernod Ricard, Suez
 1
 
@@ -503,7 +503,7 @@ Expl ain the moon lan ding to a 6 years old
 
 3892
 Child 
-Some 👌 
+Some 
 Loss
 En scale de 2k a 32K n’aide vraiment pas. 
 
@@ -750,7 +750,7 @@ Expl ain the moon lan ding to a 6 years old
 
 3892
 Child 
-Some 👌 
+Some 
 On verra ensuite comment fonctionne ce fameux modèle abstrait jusqu’ici
 
 
@@ -970,7 +970,7 @@ D
 2
 D
 1
-⛔
+
 2 ≠1
 
 50
